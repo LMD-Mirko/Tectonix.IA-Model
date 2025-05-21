@@ -3,14 +3,22 @@
   "version": "1.0.0",
   "description": "Bot especializado en información sísmica",
   "main": "indexx.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "start": "node indexx.js"
+    "start": "node indexx.js",
+    "dev": "nodemon indexx.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "axios": "^0.21.1",
+    "express": "^4.18.2",
+    "axios": "^1.6.7",
     "cors": "^2.8.5",
     "marked": "^12.0.0",
-    "sanitize-html": "^2.12.1"
+    "sanitize-html": "^2.12.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
   }
 }

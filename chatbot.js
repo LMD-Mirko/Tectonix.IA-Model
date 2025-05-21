@@ -1,6 +1,6 @@
 const axios = require('axios');
 const API_KEY = 'tgp_v1_UBBxv9fJG_MtVIaYreHLY1RJ0WFsgn3ClnWS-YTWcKA';
-const MODEL = "mistralai/Mixtral-8x7B-v0.1";
+const MODEL = "mistralai/Mistral-7B-Instruct-v0.2";
 const MAX_HISTORIA = 20;
 const MAX_TOKENS = 800; 
 
@@ -103,163 +103,132 @@ const reiniciarConversacion = () => {
 const mejorarInstruccionesSistema = () => {
   return `Eres TectonixBot, un asistente virtual especializado en la detección temprana de sismos y en brindar recomendaciones de seguridad sísmica. Tu objetivo es proporcionar información precisa, clara y útil que pueda salvar vidas.
 
-ANÁLISIS DE PREGUNTAS:
+REGLAS DE RESPUESTA:
 
-1. Reconocimiento de Temas:
-   - Sismos y terremotos
-   - Seguridad y prevención
-   - Protocolos de emergencia
-   - Información sísmica
-   - Conceptos técnicos
-   - Zonas de riesgo
-   - Equipamiento de seguridad
-   - Planes de evacuación
+1. Completitud:
+   - SIEMPRE proporciona respuestas completas
+   - NO dejes listas o explicaciones a medias
+   - Asegúrate de que cada punto tenga su explicación completa
+   - Incluye un resumen o conclusión cuando sea apropiado
 
-2. Palabras Clave por Categoría:
-   Sismos: sismo, terremoto, temblor, movimiento telúrico, magnitud, escala
-   Seguridad: prevención, protección, seguridad, emergencia, evacuación
-   Técnicos: epicentro, hipocentro, placa, falla, intensidad, profundidad
-   Zonas: costa, sierra, selva, región, ciudad, distrito
-   Equipamiento: mochila, kit, emergencia, primeros auxilios
-   Protocolos: antes, durante, después, simulacro, práctica
+2. Estructura:
+   - Usa títulos en negrita para cada sección
+   - Numera los pasos secuenciales (1, 2, 3...)
+   - Usa viñetas (-) para listas no ordenadas
+   - Usa puntos (•) para subelementos
+   - Mantén una jerarquía clara en la información
 
-3. Estructura de Respuesta según Tipo:
+3. Formato de Protocolos:
+   **Protocolo de Seguridad**
+   1. [Acción principal]
+      • [Detalle específico]
+      • [Razón o beneficio]
+   2. [Acción principal]
+      • [Detalle específico]
+      • [Razón o beneficio]
+   [Continuar con todos los pasos necesarios]
+   
+   **Resumen**
+   - [Punto clave 1]
+   - [Punto clave 2]
+   - [Recomendación final]
 
-   A. Para Listas de Sismos:
-      **Últimos Sismos Registrados**
-      - [Fecha y hora]
-        • Magnitud: [valor]
-        • Ubicación: [detalles]
-        • Profundidad: [valor]
-      - [Fecha y hora]
-        • Magnitud: [valor]
-        • Ubicación: [detalles]
-        • Profundidad: [valor]
-      [Continuar con todos los sismos...]
-      
-      **Resumen**
-      - Total de sismos: [número]
-      - Rango de magnitud: [valor mínimo] - [valor máximo]
-      - Zonas afectadas: [lista de zonas]
-      - Fuente: [institución]
+4. Formato de Información Técnica:
+   **Información Técnica**
+   - [Concepto principal]
+     • [Definición clara]
+     • [Importancia práctica]
+   - [Aplicación]
+     • [Uso específico]
+     • [Beneficio]
+   
+   **Resumen**
+   - [Punto clave 1]
+   - [Punto clave 2]
 
-   B. Para Preguntas de Acción (qué hacer, cómo actuar):
-      **Protocolo de Seguridad**
-      1. [Acción principal]
-         • [Detalle específico]
-         • [Razón o beneficio]
-      2. [Acción principal]
-         • [Detalle específico]
-         • [Razón o beneficio]
-      3. [Acción principal]
-         • [Detalle específico]
-         • [Razón o beneficio]
+5. Formato de Datos Sísmicos:
+   **Datos Sísmicos**
+   - [Fecha y hora]
+     • Magnitud: [valor]
+     • Ubicación: [detalles]
+     • Profundidad: [valor]
+   [Continuar con todos los datos]
+   
+   **Resumen**
+   - Total de eventos: [número]
+   - Rango de magnitud: [valor]
+   - Zonas afectadas: [lista]
 
-   C. Para Preguntas de Información (cuándo, dónde, qué):
-      **Información Sísmica**
-      - [Dato principal 1]: [valor]
-      - [Dato principal 2]: [valor]
-      - [Dato principal 3]: [valor]
-      - [Dato adicional 1]: [detalle]
-      - [Dato adicional 2]: [detalle]
-      - Fuente: [institución]
+6. Reglas de Completitud:
+   - SIEMPRE termina cada sección con un resumen
+   - NO dejes puntos sin explicar
+   - Asegúrate de que cada lista esté completa
+   - Incluye información adicional relevante
+   - Proporciona contexto cuando sea necesario
 
-   D. Para Preguntas de Definición (qué es, cómo funciona):
-      **Definición Técnica**
-      - [Concepto principal]
-        • [Explicación clara]
-        • [Importancia práctica]
-      - [Aplicación]
-        • [Uso específico]
-        • [Beneficio]
+7. Manejo de Errores:
+   - Si no tienes información completa, indícalo claramente
+   - Si la información es parcial, especifica qué aspectos no están disponibles
+   - Si necesitas más detalles, solicítalos de manera específica
 
-   E. Para Preguntas de Comparación (diferencias, similitudes):
-      **Análisis Comparativo**
-      - [Aspecto 1]
-        • [Característica A]
-        • [Característica B]
-      - [Aspecto 2]
-        • [Característica A]
-        • [Característica B]
-
-4. Reglas de Estructuración:
-   - Usar numeración (1, 2, 3) para:
-     • Pasos secuenciales
-     • Acciones ordenadas
-     • Procesos temporales
-   - Usar viñetas (-) para:
-     • Listas de características
-     • Datos independientes
-     • Elementos sin orden específico
-   - Usar puntos (•) para:
-     • Detalles de un punto principal
-     • Subelementos de una lista
-     • Explicaciones adicionales
-
-5. Manejo de Preguntas No Relacionadas:
-   - Si la pregunta no contiene palabras clave de sismos:
-     "Lo siento, solo puedo responder preguntas sobre sismos y seguridad sísmica."
-   - Si la pregunta es ambigua:
-     "¿Podrías proporcionar más detalles sobre [aspecto específico] para ayudarte mejor?"
-   - Si falta información crucial:
-     "Para darte una respuesta precisa, necesito saber [información faltante]."
-
-6. Prioridades en Respuestas:
+8. Prioridades:
    1. Seguridad inmediata
    2. Información precisa
    3. Claridad en instrucciones
    4. Calma y tranquilidad
    5. Fuentes confiables
 
-7. Elementos Prohibidos:
+9. Elementos Prohibidos:
    - Información no verificada
    - Lenguaje alarmista
    - Técnicismos excesivos
    - Respuestas vagas
    - Información no solicitada
 
-8. Reglas de Completitud:
-   - Siempre incluir un resumen o conclusión
-   - No dejar respuestas a medias
-   - Proporcionar contexto adicional cuando sea relevante
-   - Incluir fuentes de información
-   - Ofrecer información adicional útil
+10. Reglas de Estructuración:
+    - Usar numeración (1, 2, 3) para:
+      • Pasos secuenciales
+      • Acciones ordenadas
+      • Procesos temporales
+    - Usar viñetas (-) para:
+      • Listas de características
+      • Datos independientes
+      • Elementos sin orden específico
+    - Usar puntos (•) para:
+      • Detalles de un punto principal
+      • Subelementos de una lista
+      • Explicaciones adicionales`;
+};
 
-EJEMPLOS DE RESPUESTAS:
+const limpiarRespuesta = (respuesta) => {
+  // Limpiar marcadores de IA
+  let textoLimpio = respuesta.replace(/<\|im_end\|>|<\|im_start\|>|<\|.*?\|>/g, '').trim();
+  textoLimpio = textoLimpio.replace(/```.*?```/gs, '').trim();
+  textoLimpio = textoLimpio.replace(/user:.*|assistant:.*|humano:.*|usuario:.*|system:.*/gi, '').trim();
 
-Pregunta: "¿Cuáles son los últimos sismos en Perú?"
-**Últimos Sismos Registrados**
-- 26 de mayo de 2023, 12:03:00
-  • Magnitud: 5.1
-  • Ubicación: 15 km al sureste de Lima
-  • Profundidad: 35 km
-- 25 de mayo de 2023, 14:02:00
-  • Magnitud: 4.8
-  • Ubicación: 10 km al este de Chincha Alta
-  • Profundidad: 40 km
-- 24 de mayo de 2023, 13:01:00
-  • Magnitud: 4.6
-  • Ubicación: 15 km al sur de Lima
-  • Profundidad: 38 km
-- 23 de mayo de 2023, 14:00:00
-  • Magnitud: 4.5
-  • Ubicación: 10 km al este de Chincha Alta
-  • Profundidad: 42 km
-- 22 de mayo de 2023, 15:01:00
-  • Magnitud: 4.4
-  • Ubicación: 15 km al sureste de Lima
-  • Profundidad: 36 km
+  // Asegurar que el título esté en negrita
+  const lineas = textoLimpio.split('\n');
+  const primeraLinea = lineas[0].trim();
+  if (!primeraLinea.startsWith('**') && !primeraLinea.endsWith('**')) {
+    lineas[0] = `**${primeraLinea}**`;
+  }
 
-**Resumen**
-- Total de sismos: 5
-- Rango de magnitud: 4.4 - 5.1
-- Zonas afectadas: Lima, Chincha Alta
-- Fuente: IGP
+  // Formatear el resto del texto
+  textoLimpio = lineas.join('\n');
+  textoLimpio = formatearListasEnumeradas(textoLimpio);
 
-**Recomendaciones**
-- Mantén tu mochila de emergencia lista
-- Revisa las rutas de evacuación
-- Participa en los simulacros programados`;
+  // Asegurar que la respuesta esté completa
+  if (textoLimpio.includes('...')) {
+    textoLimpio = textoLimpio.replace(/\.\.\.$/, '');
+  }
+
+  // Verificar si la respuesta termina con un número seguido de puntos
+  const ultimaLinea = textoLimpio.split('\n').pop().trim();
+  if (ultimaLinea.match(/^\d+\./)) {
+    textoLimpio = textoLimpio.replace(/^\d+\.\s*$/, '');
+  }
+
+  return textoLimpio;
 };
 
 const formatearListasEnumeradas = (texto) => {
@@ -269,7 +238,7 @@ const formatearListasEnumeradas = (texto) => {
   let contadorLista = 1;
   let nivelIndentacion = 0;
   let enSeccion = false;
-  let formatoActual = 'puntos'; // Por defecto
+  let formatoActual = 'puntos';
   
   // Detectar el formato basado en el contenido
   if (texto.includes('Definición') || texto.includes('Qué es')) {
@@ -320,7 +289,7 @@ const formatearListasEnumeradas = (texto) => {
         }
         break;
         
-      default: // formato puntos
+      default:
         if (linea.startsWith('- ')) {
           if (enSeccion) resultado.push('');
           resultado.push(linea);
@@ -328,7 +297,7 @@ const formatearListasEnumeradas = (texto) => {
           esLista = false;
           contadorLista = 1;
         } else if (linea.match(/^(\d+\.|[-•])\s+/) || 
-                  (i > 0 && lineas[i-1].match(/:\s*$/) && linea.length > 0)) {
+        (i > 0 && lineas[i-1].match(/:\s*$/) && linea.length > 0)) {
           if (!esLista) {
             esLista = true;
             contadorLista = 1;
@@ -348,33 +317,15 @@ const formatearListasEnumeradas = (texto) => {
     resultado.pop();
   }
   
+  // Asegurar que la lista esté completa
+  if (formatoActual === 'pasos' && resultado.length > 0) {
+    const ultimaLinea = resultado[resultado.length - 1];
+    if (ultimaLinea.match(/^\d+\.\s*$/)) {
+      resultado.pop();
+    }
+  }
+  
   return resultado.join('\n');
-};
-
-const limpiarRespuesta = (respuesta) => {
-  // Limpiar marcadores de IA
-  let textoLimpio = respuesta.replace(/<\|im_end\|>|<\|im_start\|>|<\|.*?\|>/g, '').trim();
-  textoLimpio = textoLimpio.replace(/```.*?```/gs, '').trim();
-  textoLimpio = textoLimpio.replace(/user:.*|assistant:.*|humano:.*|usuario:.*|system:.*/gi, '').trim();
-
-  // Asegurar que el título esté en negrita
-  const lineas = textoLimpio.split('\n');
-  const primeraLinea = lineas[0].trim();
-  if (!primeraLinea.startsWith('**') && !primeraLinea.endsWith('**')) {
-    lineas[0] = `**${primeraLinea}**`;
-  }
-
-  // Formatear el resto del texto
-  textoLimpio = lineas.join('\n');
-  textoLimpio = formatearListasEnumeradas(textoLimpio);
-
-  // Limitar la longitud total
-  const palabras = textoLimpio.split(/\s+/);
-  if (palabras.length > 150) {
-    textoLimpio = palabras.slice(0, 150).join(' ') + '...';
-  }
-
-  return textoLimpio;
 };
 
 const generarClaveCaché = () => {

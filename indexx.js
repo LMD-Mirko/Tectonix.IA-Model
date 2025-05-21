@@ -1,8 +1,16 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { responderChat, reiniciarConversacion, verificarConexion } = require('./chatbot');
 
 const app = express();
+
+// Configuración de CORS
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 
 // Función para obtener el puerto del servidor
 const obtenerPuerto = () => {
@@ -11,7 +19,7 @@ const obtenerPuerto = () => {
 
 const PORT = obtenerPuerto();
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 let apiDisponible = false;
@@ -138,6 +146,7 @@ app.use('*', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+  console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
   console.log(`URL de la API: http://localhost:${PORT}/api`);
   console.log('Verificando conexión con la API de Together...');
 });
