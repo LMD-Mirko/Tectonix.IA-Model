@@ -9,6 +9,15 @@ yarn-error.log
 .env.local
 .env.*.local
 
+# Credentials
+*.json
+!package.json
+!package-lock.json
+credentials/
+config/credentials/
+google-credentials.json
+google-credentials-*.json
+
 # IDE
 .vscode/
 .idea/

@@ -19,6 +19,24 @@ const obtenerPuerto = () => {
 
 const PORT = obtenerPuerto();
 
+// Configurar credenciales de Google Cloud
+try {
+  if (process.env.GOOGLE_CREDENTIALS) {
+    // Si las credenciales vienen como variable de entorno (Railway)
+    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = credentials;
+    console.log('Credenciales de Google Cloud configuradas desde variable de entorno');
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    // Si las credenciales vienen como ruta de archivo (desarrollo local)
+    console.log('Credenciales de Google Cloud configuradas desde archivo');
+  } else {
+    throw new Error('No se encontraron credenciales de Google Cloud');
+  }
+} catch (error) {
+  console.error('Error al configurar las credenciales de Google Cloud:', error);
+  process.exit(1);
+}
+
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -40,15 +58,15 @@ setInterval(comprobarEstadoAPI, 5 * 60 * 1000);
 app.get('/api/status', async (req, res) => {
   try {
     apiDisponible = await verificarConexion();
-    res.json({ 
-      status: 'ok', 
-      apiConectada: apiDisponible 
+    res.json({
+      status: 'ok',
+      apiConectada: apiDisponible
     });
   } catch (error) {
     console.error('Error al verificar estado:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       status: 'error',
-      mensaje: 'Error al verificar la conexión con la API de Together',
+      mensaje: 'Error al verificar la conexión con la API de Google Cloud',
       apiConectada: false
     });
   }
@@ -63,43 +81,43 @@ app.post('/api/chat', async (req, res) => {
         respuesta: 'Lo siento, el servicio de asistencia sísmica no está disponible. Estamos trabajando para resolver el problema.'
       });
     }
-    
+
     const { mensaje } = req.body;
-    
+
     if (!mensaje || typeof mensaje !== 'string') {
       return res.status(400).json({
         status: 'error',
         mensaje: 'El mensaje es requerido y debe ser un texto'
       });
     }
-    
+
     console.log(`Procesando consulta sísmica: "${mensaje}"`);
-    
+
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Tiempo de espera agotado')), 30000);
     });
-    
+
     const respuesta = await Promise.race([
       responderChat(mensaje),
       timeoutPromise
     ]);
-    
+
     return res.json({
       status: 'ok',
       respuesta
     });
-    
+
   } catch (error) {
     console.error('Error en la API de chat:', error);
-    
+
     let mensaje = 'Error al procesar la consulta sísmica';
     let statusCode = 500;
-    
+
     if (error.message === 'Tiempo de espera agotado') {
       mensaje = 'La respuesta está tomando demasiado tiempo. Por favor, intenta con una consulta más específica.';
       statusCode = 504;
     }
-    
+
     return res.status(statusCode).json({
       status: 'error',
       mensaje,
@@ -148,5 +166,5 @@ app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en el puerto ${PORT}`);
   console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
   console.log(`URL de la API: http://localhost:${PORT}/api`);
-  console.log('Verificando conexión con la API de Together...');
+  console.log('Verificando conexión con la API de Google Cloud...');
 });
