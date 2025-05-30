@@ -9,23 +9,32 @@ yarn-error.log
 .env.local
 .env.*.local
 
-# Credentials
+# Google Cloud credentials
 *.json
 !package.json
 !package-lock.json
-credentials/
-config/credentials/
-google-credentials.json
-google-credentials-*.json
 
 # IDE
-.vscode/
 .idea/
-
-# Logs
-logs/
-*.log
+.vscode/
+*.swp
+*.swo
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Build
+dist/
+build/
+
+# Coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/ 

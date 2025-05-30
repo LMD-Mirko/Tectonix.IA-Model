@@ -22,9 +22,9 @@ const PORT = obtenerPuerto();
 // Configurar credenciales de Google Cloud
 try {
   if (process.env.GOOGLE_CREDENTIALS) {
-    // Si las credenciales vienen como variable de entorno (Railway)
+    // Si las credenciales vienen como variable de entorno (Render/Railway)
     const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = credentials;
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = JSON.stringify(credentials);
     console.log('Credenciales de Google Cloud configuradas desde variable de entorno');
   } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     // Si las credenciales vienen como ruta de archivo (desarrollo local)

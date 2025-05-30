@@ -146,6 +146,65 @@ tectonixbot/
 - El healthcheck configurado verificará el estado de la aplicación cada 5 minutos
 - La aplicación se reiniciará automáticamente en caso de fallos
 
+## Despliegue en Render
+
+### Requisitos Previos
+- Cuenta en [Render](https://render.com)
+- Cuenta en Google Cloud con Vertex AI habilitado
+- Credenciales de servicio de Google Cloud
+
+### Pasos para el Despliegue
+
+1. **Preparar las Credenciales**
+   - Asegúrate de tener tu archivo de credenciales de Google Cloud
+   - Copia todo el contenido del archivo JSON de credenciales
+
+2. **Configurar en Render**
+   - Crea una nueva cuenta en [Render](https://render.com)
+   - Ve a "New +" y selecciona "Web Service"
+   - Conecta tu repositorio de GitHub
+   - Configura el servicio:
+     - Name: tectonix-bot
+     - Environment: Node
+     - Build Command: `npm install`
+     - Start Command: `npm start`
+     - Plan: Free (o el que prefieras)
+
+3. **Configurar Variables de Entorno**
+   En el panel de Render, configura las siguientes variables:
+   ```
+   PORT=10000
+   NODE_ENV=production
+   GOOGLE_CREDENTIALS=<contenido_completo_del_archivo_json>
+   CORS_ORIGIN=<url_de_tu_frontend>
+   ```
+
+4. **Despliegue**
+   - Render detectará automáticamente el archivo `render.yaml`
+   - El despliegue comenzará automáticamente
+   - Puedes monitorear el proceso en la sección "Logs"
+
+5. **Verificación**
+   - Una vez desplegado, Render te proporcionará una URL
+   - Prueba el endpoint `/api/status` para verificar que todo funcione
+   - Verifica los logs en caso de errores
+
+### Solución de Problemas
+
+Si encuentras errores durante el despliegue:
+
+1. **Error de Credenciales**
+   - Verifica que el contenido de `GOOGLE_CREDENTIALS` sea un JSON válido
+   - Asegúrate de que las credenciales tengan los permisos necesarios
+
+2. **Error de Puerto**
+   - Render asignará automáticamente el puerto
+   - No es necesario modificar el puerto en el código
+
+3. **Error de Conexión**
+   - Verifica que las credenciales de Google Cloud sean correctas
+   - Asegúrate de que el proyecto tenga Vertex AI habilitado
+
 ## 🔧 Configuración del Entorno
 
 ### Variables de Entorno Requeridas
