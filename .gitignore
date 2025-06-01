@@ -9,6 +9,9 @@ yarn-error.log
 .env.local
 .env.*.local
 
+node_modules/
+config/credentials.json
+
 # IDE
 .vscode/
 .idea/
