@@ -5,7 +5,7 @@ const { VertexAI } = require('@google-cloud/vertexai');
 
 // Configuración de Google Cloud usando variables de entorno
 const auth = new GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON),
+  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
   scopes: 'https://www.googleapis.com/auth/cloud-platform',
 });
 
@@ -300,12 +300,10 @@ const responderChat = async (mensajeUsuario) => {
 
 const verificarConexion = async () => {
   try {
-    const response = await generativeModel.generateContent({
-      contents: [{ role: "user", parts: [{ text: "Hola" }] }],
-    });
+    await auth.getClient(); // Solo verifica que las credenciales son válidas
     return true;
   } catch (error) {
-    console.error("Error de conexión con la API:", error.message);
+    console.error('❌ Error en credenciales Google:', error.message);
     return false;
   }
 };
