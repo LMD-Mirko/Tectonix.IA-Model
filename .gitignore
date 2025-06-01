@@ -9,6 +9,8 @@ yarn-error.log
 .env.local
 .env.*.local
 
+node_modules/
+config/credentials.json
 # Google Cloud credentials
 *.json
 !package.json
