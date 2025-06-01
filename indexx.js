@@ -48,8 +48,8 @@ const comprobarEstadoAPI = async () => {
 comprobarEstadoAPI();
 setInterval(comprobarEstadoAPI, 5 * 60 * 1000);
 
-// Endpoint de healthcheck
-app.get('/health', (req, res) => {
+// Endpoint de healthcheck alternativo
+app.get('/status', (req, res) => {
   res.status(200).send('OK');
 });
 
