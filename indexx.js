@@ -162,9 +162,14 @@ app.use('*', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
-  console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`URL de la API: http://localhost:${PORT}/api`);
-  console.log('Verificando conexión con la API de Google Cloud...');
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Servidor activo en http://0.0.0.0:${PORT}`);
+  console.log('🔍 Variables de entorno:', {
+    PORT: process.env.PORT,
+    NODE_ENV: process.env.NODE_ENV
+  });
 });
