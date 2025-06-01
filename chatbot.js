@@ -1,30 +1,30 @@
-require('dotenv').config(); // Cargar variables de entorno al inicio
+// Cargar variables de entorno al inicio
+require('dotenv').config();
 
 const { GoogleAuth } = require('google-auth-library');
 const { VertexAI } = require('@google-cloud/vertexai');
 
-// Configuración de Google Cloud usando variables de entorno
+// Configuración de Google Cloud
 const auth = new GoogleAuth({
   credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
   scopes: 'https://www.googleapis.com/auth/cloud-platform',
 });
 
-const vertexAI = new VertexAI({ 
-  auth, 
-  project: process.env.GOOGLE_PROJECT_ID || 'fluted-clock-461222-g7', 
-  location: process.env.GOOGLE_LOCATION || 'us-central1' 
+const vertexAI = new VertexAI({
+  auth,
+  project: process.env.GOOGLE_PROJECT_ID || 'fluted-clock-461222-g7',
+  location: process.env.GOOGLE_LOCATION || 'us-central1'
 });
 
 const generativeModel = vertexAI.preview.getGenerativeModel({
   model: process.env.GOOGLE_MODEL || 'gemini-2.0-flash-001',
 });
 
-// Configuración de la aplicación con variables de entorno
-const MAX_HISTORIA = process.env.MAX_HISTORY || 20;
-const MAX_TOKENS = process.env.MAX_TOKENS || 400;
-const CACHE_TIEMPO = process.env.CACHE_TIME || 60 * 60 * 1000;
-const cacheRespuestas = new Map();
+const MAX_HISTORIA = parseInt(process.env.MAX_HISTORY || '20');
+const MAX_TOKENS = parseInt(process.env.MAX_TOKENS || '400');
+const CACHE_TIEMPO = parseInt(process.env.CACHE_TIME || `${60 * 60 * 1000}`);
 
+const cacheRespuestas = new Map();
 let historialConversacion = [];
 
 // Base de conocimiento específica para sismos
@@ -67,7 +67,7 @@ const baseConocimiento = {
       descripcion: "Costa peruana - Mayor actividad sísmica"
     },
     zona3: {
-      riesgo: "Alto", 
+      riesgo: "Alto",
       ciudades: ["Huancayo", "Cusco", "Huaraz", "Cajamarca"],
       descripcion: "Sierra - Alta probabilidad sísmica"
     },
@@ -84,7 +84,6 @@ const baseConocimiento = {
   }
 };
 
-// Palabras clave relacionadas con sismos
 const palabrasClaveSismos = [
   'sismo', 'terremoto', 'temblor', 'seísmo', 'movimiento telúrico',
   'magnitud', 'escala richter', 'escala mercalli', 'epicentro',
@@ -96,16 +95,14 @@ const palabrasClaveSismos = [
   'placa de nazca', 'simulacro', 'mochila de emergencia', 'réplica'
 ];
 
-// Lugares sísmicos en Perú
 const lugaresSismicos = [
   'perú', 'lima', 'arequipa', 'cusco', 'tacna', 'nazca', 'sudamérica',
   'callao', 'trujillo', 'chiclayo', 'iquitos', 'pucallpa', 'tarapoto',
   'moquegua', 'ica', 'pisco', 'chimbote', 'piura', 'sullana', 'cajamarca'
 ];
 
-// FUNCIÓN PARA CREAR CONTEXTO ESTRUCTURADO
 const crearContextoEstructurado = (mensajeUsuario) => {
-  const contexto = `Eres un asistente especializado en sismos del Perú. REGLAS IMPORTANTES:
+  return `Eres un asistente especializado en sismos del Perú. REGLAS IMPORTANTES:
 
 📝 FORMATO DE RESPUESTA:
 - Respuestas cortas y directas (máximo ${MAX_TOKENS} tokens)
@@ -124,34 +121,21 @@ const crearContextoEstructurado = (mensajeUsuario) => {
 **[Respuesta principal]**
 
 1. [Punto clave 1]
-2. [Punto clave 2] 
+2. [Punto clave 2]
 3. [Punto clave 3]
 
 Pregunta del usuario: "${mensajeUsuario}"`;
-
-  return contexto;
 };
 
-// Función para verificar si la pregunta está relacionada con sismos
 const esPreguntaSismica = (texto) => {
-  if (!texto || typeof texto !== 'string') {
-    return false;
-  }
+  if (!texto || typeof texto !== 'string') return false;
 
-  const textoMinusculas = texto.toLowerCase();
+  const textoMin = texto.toLowerCase();
 
-  const contienePalabraClave = palabrasClaveSismos.some(palabra =>
-    textoMinusculas.includes(palabra.toLowerCase())
-  );
-
-  const mencionaLugar = lugaresSismicos.some(lugar =>
-    textoMinusculas.includes(lugar.toLowerCase())
-  );
-
-  const preguntaZonaSismica = /(zona|área|región)\s*(sísmic|sísmico|sísmica)/i.test(textoMinusculas);
-  const contieneTiempo = /(hoy|ayer|esta semana|este mes|reciente|últimos)/i.test(textoMinusculas);
-
-  return contienePalabraClave || mencionaLugar || preguntaZonaSismica || contieneTiempo;
+  return palabrasClaveSismos.some(p => textoMin.includes(p)) ||
+         lugaresSismicos.some(l => textoMin.includes(l)) ||
+         /(zona|área|región)\s*(sísmic|sísmico|sísmica)/i.test(textoMin) ||
+         /(hoy|ayer|esta semana|este mes|reciente|últimos)/i.test(textoMin);
 };
 
 const reiniciarConversacion = () => {
@@ -160,30 +144,20 @@ const reiniciarConversacion = () => {
   return "Conversación reiniciada. ¿En qué puedo ayudarte con información sobre sismos?";
 };
 
-// FUNCIÓN DE LIMPIEZA MEJORADA
 const limpiarRespuesta = (respuesta) => {
-  let textoLimpio = respuesta
+  return respuesta
     .replace(/<\|im_end\|>|<\|im_start\|>|<\|.*?\|>/g, '')
     .replace(/```.*?```/gs, '')
     .replace(/user:.*|assistant:.*|humano:.*|usuario:.*|system:.*/gi, '')
+    .replace(/^\d+\.\s*/gm, m => m.trim())
+    .replace(/(\d+\.\s[^\n]+)(?=\d+\.)/g, '$1\n')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
-
-  // Mejorar formato de listas numeradas
-  textoLimpio = textoLimpio.replace(/^(\d+)\.\s*/gm, '$1. ');
-  
-  // Asegurar que haya saltos de línea apropiados
-  textoLimpio = textoLimpio.replace(/(\d+\.\s[^\n]+)(?=\d+\.)/g, '$1\n');
-  
-  // Limpiar espacios extra
-  textoLimpio = textoLimpio.replace(/\n{3,}/g, '\n\n');
-  
-  return textoLimpio.trim();
 };
 
 const generarClaveCaché = () => {
   if (historialConversacion.length === 0) return '';
-  const mensajesRecientes = historialConversacion.slice(-3);
-  return mensajesRecientes.map(m => `${m.role}:${m.content}`).join('|');
+  return historialConversacion.slice(-3).map(m => `${m.role}:${m.content}`).join('|');
 };
 
 const responderChat = async (mensajeUsuario) => {
@@ -196,15 +170,11 @@ const responderChat = async (mensajeUsuario) => {
       return "Lo siento, solo estoy entrenado para responder preguntas relacionadas con sismos y actividad sísmica.";
     }
 
-    // Agregar contexto estructurado al primer mensaje
     const mensajeConContexto = historialConversacion.length === 0 
       ? crearContextoEstructurado(mensajeUsuario)
       : mensajeUsuario;
 
-    historialConversacion.push({
-      role: "user",
-      content: mensajeConContexto
-    });
+    historialConversacion.push({ role: "user", content: mensajeConContexto });
 
     if (historialConversacion.length > MAX_HISTORIA) {
       historialConversacion = historialConversacion.slice(-MAX_HISTORIA);
@@ -215,73 +185,40 @@ const responderChat = async (mensajeUsuario) => {
 
     if (entradaCaché && (Date.now() - entradaCaché.timestamp) < CACHE_TIEMPO) {
       console.log("Respuesta recuperada de caché");
-      historialConversacion.push({
-        role: "assistant",
-        content: entradaCaché.respuesta
-      });
+      historialConversacion.push({ role: "assistant", content: entradaCaché.respuesta });
       return entradaCaché.respuesta;
     }
 
-    const mensajesIA = historialConversacion.map(m => ({
-      role: m.role,
-      parts: [{ text: m.content }]
-    }));
+    const mensajesIA = historialConversacion.map(m => ({ role: m.role, parts: [{ text: m.content }] }));
 
     const response = await generativeModel.generateContent({
       contents: mensajesIA,
       generationConfig: {
         maxOutputTokens: MAX_TOKENS,
-        temperature: 0.2, // Más determinista para respuestas más consistentes
+        temperature: 0.2,
         topP: 0.8,
         topK: 40
       },
     });
 
-    let respuesta = response.response.candidates[0].content.parts[0].text;
+    let respuesta = response.response.candidates?.[0]?.content?.parts?.[0]?.text || 'No se pudo generar una respuesta.';
     respuesta = limpiarRespuesta(respuesta);
 
-    cacheRespuestas.set(claveCaché, {
-      respuesta,
-      timestamp: Date.now()
-    });
-
+    cacheRespuestas.set(claveCaché, { respuesta, timestamp: Date.now() });
     if (cacheRespuestas.size > 100) {
       const primeraEntrada = cacheRespuestas.keys().next().value;
       cacheRespuestas.delete(primeraEntrada);
     }
 
-    historialConversacion.push({
-      role: "assistant",
-      content: respuesta
-    });
-
+    historialConversacion.push({ role: "assistant", content: respuesta });
     return respuesta;
   } catch (error) {
-    console.error("Error al conectar con la IA:", error.message);
-
-    if (error.response) {
-      console.error("Detalles del error:", error.response.data);
-      if (error.response.status === 429) {
-        return "Estamos experimentando mucho tráfico en este momento. Por favor, intenta de nuevo en unos minutos.";
-      }
-    }
-
-    return "Lo siento, estoy teniendo problemas técnicos. ¿Podrías intentarlo más tarde?";
-  }
-};
-
-const verificarConexion = async () => {
-  try {
-    await auth.getClient(); // Solo verifica que las credenciales son válidas
-    return true;
-  } catch (error) {
-    console.error('❌ Error en credenciales Google:', error.message);
-    return false;
+    console.error("Error al generar respuesta con Gemini:", error);
+    return "Ocurrió un error al generar la respuesta. Por favor, intenta nuevamente más tarde.";
   }
 };
 
 module.exports = {
   responderChat,
-  reiniciarConversacion,
-  verificarConexion
+  reiniciarConversacion
 };
