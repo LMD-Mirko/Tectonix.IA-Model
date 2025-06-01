@@ -19,6 +19,24 @@ const obtenerPuerto = () => {
 
 const PORT = obtenerPuerto();
 
+// Configurar credenciales de Google Cloud
+try {
+  if (process.env.GOOGLE_CREDENTIALS) {
+    // Si las credenciales vienen como variable de entorno (Render/Railway)
+    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = JSON.stringify(credentials);
+    console.log('Credenciales de Google Cloud configuradas desde variable de entorno');
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    // Si las credenciales vienen como ruta de archivo (desarrollo local)
+    console.log('Credenciales de Google Cloud configuradas desde archivo');
+  } else {
+    throw new Error('No se encontraron credenciales de Google Cloud');
+  }
+} catch (error) {
+  console.error('Error al configurar las credenciales de Google Cloud:', error);
+  process.exit(1);
+}
+
 app.use(cors(corsOptions));
 app.use(express.json());
 

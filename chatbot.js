@@ -23,6 +23,23 @@ const generativeModel = vertexAI.preview.getGenerativeModel({
 const MAX_HISTORIA = process.env.MAX_HISTORY || 20;
 const MAX_TOKENS = process.env.MAX_TOKENS || 400; // Reducido para respuestas más concisas
 const CACHE_TIEMPO = process.env.CACHE_TIME || 60 * 60 * 1000;
+const { GoogleAuth } = require('google-auth-library');
+const { VertexAI } = require('@google-cloud/vertexai');
+
+// Configuración de Google Cloud
+const auth = new GoogleAuth({
+  keyFilename: './config/credentials.json',
+  scopes: 'https://www.googleapis.com/auth/cloud-platform',
+});
+
+const vertexAI = new VertexAI({ auth, project: 'fluted-clock-461222-g7', location: 'us-central1' });
+const generativeModel = vertexAI.preview.getGenerativeModel({
+  model: 'gemini-2.0-flash-001',
+});
+
+const MAX_HISTORIA = 20;
+const MAX_TOKENS = 400; // Reducido para respuestas más concisas
+const CACHE_TIEMPO = 60 * 60 * 1000;
 const cacheRespuestas = new Map();
 
 let historialConversacion = [];
@@ -103,12 +120,23 @@ const lugaresSismicos = [
   'moquegua', 'ica', 'pisco', 'chimbote', 'piura', 'sullana', 'cajamarca'
 ];
 
+
+];
+
+// Lugares sísmicos en Perú (mantenemos tu lista)
+const lugaresSismicos = [
+  'perú', 'lima', 'arequipa', 'cusco', 'tacna', 'nazca', 'sudamérica',
+  'callao', 'trujillo', 'chiclayo', 'iquitos', 'pucallpa', 'tarapoto',
+  'moquegua', 'ica', 'pisco', 'chimbote', 'piura', 'sullana', 'cajamarca'
+];
+
 // FUNCIÓN PARA CREAR CONTEXTO ESTRUCTURADO
 const crearContextoEstructurado = (mensajeUsuario) => {
   const contexto = `Eres un asistente especializado en sismos del Perú. REGLAS IMPORTANTES:
 
 📝 FORMATO DE RESPUESTA:
 - Respuestas cortas y directas (máximo ${MAX_TOKENS} tokens)
+- Respuestas cortas y directas (máximo 400 tokens)
 - Usar markdown para estructura clara
 - Enumerar puntos importantes con números (1., 2., 3.)
 - Una oración principal en **negrita** al inicio
