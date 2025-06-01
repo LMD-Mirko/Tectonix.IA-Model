@@ -5,7 +5,7 @@ const { VertexAI } = require('@google-cloud/vertexai');
 
 // Configuración de Google Cloud usando variables de entorno
 const auth = new GoogleAuth({
-  keyFilename: process.env.GOOGLE_CREDENTIALS_PATH || './config/credentials.json',
+  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON),
   scopes: 'https://www.googleapis.com/auth/cloud-platform',
 });
 
