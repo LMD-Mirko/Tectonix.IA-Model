@@ -21,30 +21,13 @@ const generativeModel = vertexAI.preview.getGenerativeModel({
 
 // Configuración de la aplicación con variables de entorno
 const MAX_HISTORIA = process.env.MAX_HISTORY || 20;
-const MAX_TOKENS = process.env.MAX_TOKENS || 400; // Reducido para respuestas más concisas
+const MAX_TOKENS = process.env.MAX_TOKENS || 400;
 const CACHE_TIEMPO = process.env.CACHE_TIME || 60 * 60 * 1000;
-const { GoogleAuth } = require('google-auth-library');
-const { VertexAI } = require('@google-cloud/vertexai');
-
-// Configuración de Google Cloud
-const auth = new GoogleAuth({
-  keyFilename: './config/credentials.json',
-  scopes: 'https://www.googleapis.com/auth/cloud-platform',
-});
-
-const vertexAI = new VertexAI({ auth, project: 'fluted-clock-461222-g7', location: 'us-central1' });
-const generativeModel = vertexAI.preview.getGenerativeModel({
-  model: 'gemini-2.0-flash-001',
-});
-
-const MAX_HISTORIA = 20;
-const MAX_TOKENS = 400; // Reducido para respuestas más concisas
-const CACHE_TIEMPO = 60 * 60 * 1000;
 const cacheRespuestas = new Map();
 
 let historialConversacion = [];
 
-// Base de conocimiento específica para sismos (mantenemos tu estructura)
+// Base de conocimiento específica para sismos
 const baseConocimiento = {
   definiciones: {
     sismo: "Movimiento brusco de la corteza terrestre causado por la liberación de energía acumulada.",
@@ -101,7 +84,7 @@ const baseConocimiento = {
   }
 };
 
-// Palabras clave relacionadas con sismos (mantenemos tu lista)
+// Palabras clave relacionadas con sismos
 const palabrasClaveSismos = [
   'sismo', 'terremoto', 'temblor', 'seísmo', 'movimiento telúrico',
   'magnitud', 'escala richter', 'escala mercalli', 'epicentro',
@@ -113,17 +96,7 @@ const palabrasClaveSismos = [
   'placa de nazca', 'simulacro', 'mochila de emergencia', 'réplica'
 ];
 
-// Lugares sísmicos en Perú (mantenemos tu lista)
-const lugaresSismicos = [
-  'perú', 'lima', 'arequipa', 'cusco', 'tacna', 'nazca', 'sudamérica',
-  'callao', 'trujillo', 'chiclayo', 'iquitos', 'pucallpa', 'tarapoto',
-  'moquegua', 'ica', 'pisco', 'chimbote', 'piura', 'sullana', 'cajamarca'
-];
-
-
-];
-
-// Lugares sísmicos en Perú (mantenemos tu lista)
+// Lugares sísmicos en Perú
 const lugaresSismicos = [
   'perú', 'lima', 'arequipa', 'cusco', 'tacna', 'nazca', 'sudamérica',
   'callao', 'trujillo', 'chiclayo', 'iquitos', 'pucallpa', 'tarapoto',
@@ -136,7 +109,6 @@ const crearContextoEstructurado = (mensajeUsuario) => {
 
 📝 FORMATO DE RESPUESTA:
 - Respuestas cortas y directas (máximo ${MAX_TOKENS} tokens)
-- Respuestas cortas y directas (máximo 400 tokens)
 - Usar markdown para estructura clara
 - Enumerar puntos importantes con números (1., 2., 3.)
 - Una oración principal en **negrita** al inicio
@@ -160,7 +132,7 @@ Pregunta del usuario: "${mensajeUsuario}"`;
   return contexto;
 };
 
-// Función para verificar si la pregunta está relacionada con sismos (mantienes tu lógica)
+// Función para verificar si la pregunta está relacionada con sismos
 const esPreguntaSismica = (texto) => {
   if (!texto || typeof texto !== 'string') {
     return false;
@@ -224,7 +196,7 @@ const responderChat = async (mensajeUsuario) => {
       return "Lo siento, solo estoy entrenado para responder preguntas relacionadas con sismos y actividad sísmica.";
     }
 
-    // AQUÍ ESTÁ EL CAMBIO CLAVE: Agregamos contexto estructurado al primer mensaje
+    // Agregar contexto estructurado al primer mensaje
     const mensajeConContexto = historialConversacion.length === 0 
       ? crearContextoEstructurado(mensajeUsuario)
       : mensajeUsuario;
