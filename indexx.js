@@ -12,12 +12,8 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-// Función para obtener el puerto del servidor
-const obtenerPuerto = () => {
-  return process.env.PORT || 3001;
-};
-
-const PORT = obtenerPuerto();
+app.use(cors(corsOptions));
+app.use(express.json());
 
 // Configurar credenciales de Google Cloud
 try {
@@ -37,9 +33,6 @@ try {
   process.exit(1);
 }
 
-app.use(cors(corsOptions));
-app.use(express.json());
-
 let apiDisponible = false;
 
 const comprobarEstadoAPI = async () => {
@@ -55,6 +48,12 @@ const comprobarEstadoAPI = async () => {
 comprobarEstadoAPI();
 setInterval(comprobarEstadoAPI, 5 * 60 * 1000);
 
+// Endpoint de healthcheck
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// Endpoint para verificar el estado del servicio
 app.get('/api/status', async (req, res) => {
   try {
     apiDisponible = await verificarConexion();
@@ -72,6 +71,7 @@ app.get('/api/status', async (req, res) => {
   }
 });
 
+// Endpoint para manejar las consultas del chat
 app.post('/api/chat', async (req, res) => {
   try {
     if (!apiDisponible) {
@@ -126,6 +126,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// Endpoint para reiniciar la conversación
 app.post('/api/chat/reiniciar', (req, res) => {
   try {
     const mensaje = reiniciarConversacion();
@@ -143,6 +144,7 @@ app.post('/api/chat/reiniciar', (req, res) => {
   }
 });
 
+// Endpoint principal de la API
 app.get('/api', (req, res) => {
   res.json({
     status: 'ok',
@@ -155,6 +157,7 @@ app.get('/api', (req, res) => {
   });
 });
 
+// Manejo de rutas no encontradas
 app.use('*', (req, res) => {
   res.status(404).json({
     status: 'error',
@@ -162,10 +165,8 @@ app.use('*', (req, res) => {
   });
 });
 
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
+// Iniciar el servidor
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor activo en http://0.0.0.0:${PORT}`);
   console.log('🔍 Variables de entorno:', {
