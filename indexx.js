@@ -4,6 +4,7 @@ const { responderChat, reiniciarConversacion, verificarConexion } = require('./c
 
 const app = express();
 
+<<<<<<< HEAD
 // Función para obtener el puerto del servidor
 const obtenerPuerto = () => {
   return process.env.PORT || 3001;
@@ -13,6 +14,35 @@ const PORT = obtenerPuerto();
 
 app.use(cors());
 app.use(express.json());
+=======
+// Configuración de CORS
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
+// Configurar credenciales de Google Cloud
+try {
+  if (process.env.GOOGLE_CREDENTIALS) {
+    // Si las credenciales vienen como variable de entorno (Render/Railway)
+    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = JSON.stringify(credentials);
+    console.log('Credenciales de Google Cloud configuradas desde variable de entorno');
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    // Si las credenciales vienen como ruta de archivo (desarrollo local)
+    console.log('Credenciales de Google Cloud configuradas desde archivo');
+  } else {
+    throw new Error('No se encontraron credenciales de Google Cloud');
+  }
+} catch (error) {
+  console.error('Error al configurar las credenciales de Google Cloud:', error);
+  process.exit(1);
+}
+>>>>>>> 2e0ad014ec882631b7477b8cf8e021f618b9f1c3
 
 let apiDisponible = false;
 
@@ -30,6 +60,14 @@ const comprobarEstadoAPI = async () => {
 comprobarEstadoAPI();
 setInterval(comprobarEstadoAPI, 5 * 60 * 1000);
 
+<<<<<<< HEAD
+=======
+// Endpoint de healthcheck alternativo
+app.get('/status', (req, res) => {
+  res.status(200).send('OK');
+});
+
+>>>>>>> 2e0ad014ec882631b7477b8cf8e021f618b9f1c3
 // Endpoint para verificar el estado del servicio
 app.get('/api/status', async (req, res) => {
   try {
@@ -54,7 +92,11 @@ app.get('/api/status', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // Endpoint principal para el chat sobre sismos
+=======
+// Endpoint para manejar las consultas del chat
+>>>>>>> 2e0ad014ec882631b7477b8cf8e021f618b9f1c3
 app.post('/api/chat', async (req, res) => {
   try {
     if (!apiDisponible) {
@@ -140,7 +182,11 @@ app.post('/api/chat/reiniciar', (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // Endpoint de información de la API
+=======
+// Endpoint principal de la API
+>>>>>>> 2e0ad014ec882631b7477b8cf8e021f618b9f1c3
 app.get('/api', (req, res) => {
   res.json({
     status: 'ok',
@@ -182,7 +228,11 @@ app.get('/api', (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 // Middleware para rutas no encontradas
+=======
+// Manejo de rutas no encontradas
+>>>>>>> 2e0ad014ec882631b7477b8cf8e021f618b9f1c3
 app.use('*', (req, res) => {
   res.status(404).json({
     status: 'error',
@@ -194,6 +244,7 @@ app.use('*', (req, res) => {
 });
 
 // Iniciar el servidor
+<<<<<<< HEAD
 app.listen(PORT, () => {
   console.log('\n🌍 =====================================');
   console.log('🚀 SISMOBOT API - SERVIDOR INICIADO');
@@ -207,3 +258,13 @@ app.listen(PORT, () => {
   console.log('🌍 Especialidad: Sismos y Terremotos');
   console.log('=====================================\n');
 });
+=======
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Servidor activo en http://0.0.0.0:${PORT}`);
+  console.log('🔍 Variables de entorno:', {
+    PORT: process.env.PORT,
+    NODE_ENV: process.env.NODE_ENV
+  });
+});
+>>>>>>> 2e0ad014ec882631b7477b8cf8e021f618b9f1c3

@@ -1,2 +1,45 @@
 node_modules/
+<<<<<<< HEAD
 .env
+=======
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+node_modules/
+config/credentials.json
+# Google Cloud credentials
+*.json
+!package.json
+!package-lock.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Build
+dist/
+build/
+
+# Coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/ 
+>>>>>>> 2e0ad014ec882631b7477b8cf8e021f618b9f1c3
