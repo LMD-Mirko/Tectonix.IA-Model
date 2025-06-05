@@ -1,23 +1,10 @@
 {
-  "name": "sismobot-api",
-  "version": "1.0.0",
-  "description": "API REST para un chatbot inteligente que utiliza la API de Together",
-  "main": "indexx.js",
-  "scripts": {
-    "start": "node indexx.js",
-    "dev": "nodemon indexx.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "dependencies": {
     "axios": "^1.9.0",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "dotenv": "^16.0.3"
+    "express": "^4.17.1"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
+  "scripts": {
+    "start": "node indexx.js"
   }
 }
